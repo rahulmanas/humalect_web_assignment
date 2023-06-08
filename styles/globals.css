@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 html,
 body {
   padding: 0;
@@ -35,4 +39,30 @@ ul {
 button {
   padding: 0.5rem 1rem;
   font-weight: bold;
+}
+
+.main-content {
+  @apply max-w-screen-content h-full px-4 md:px-6 py-6 overflow-hidden grow;
+}
+
+.lineClamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.lineClamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.login-box {
+  @apply relative max-w-539 w-full pt-14 pb-11 px-8 lg:px-12 bg-border-bg dark:bg-dark rounded-xl text-primary-dark dark:text-white mx-auto;
+}
+
+.input-box {
+  @apply rounded-xl w-full px-4 py-2 text-black;
 }
