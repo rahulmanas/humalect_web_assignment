@@ -4,6 +4,7 @@ import Tab1Details from "../../components/Github/Tab1Details";
 import Tab2Details from "../../components/Github/Tab2Details";
 import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
+import { axiosAssetDashApi } from "../../api";
 // import { axiosAssetDashApi } from "../../api";
 
 const GitHub = () => {
@@ -12,7 +13,6 @@ const GitHub = () => {
   const [accessToken, setAccessToken] = useState(null);
   const [user, setUser] = useState(null);
   const [repoDetails, setRepoDetails] = useState(null);
-  const [selectedRepoDetails, setSelectedRepoDetails] = useState(null);
   const tabs = ["Tab1", "Tab2"];
   const [selectedTab, setSelectedTab] = useState("Tab1");
   const [buttonText, setButtonText] = useState("Connect your repository");
@@ -28,17 +28,9 @@ const GitHub = () => {
       // delete the connection from the db and fetch token again;
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.delete(
-          "http://localhost:1337/api/github/token",
-          {
-            data: { access_token: accessToken },
-          },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`, // Set the Authorization header with the token
-            },
-          }
-        );
+        const response = await axiosAssetDashApi.delete("/api/github/token", {
+          data: { access_token: accessToken },
+        });
         if (response.status === 200) {
           setButtonText("Connect your repository");
           toast.success(response.data);
@@ -69,13 +61,8 @@ const GitHub = () => {
 
   const fetchToken = async () => {
     try {
-      const response = await axios.get(
-        "http://localhost:1337/api/github/token",
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Set the Authorization header with the token
-          },
-        }
+      const response = await axiosAssetDashApi.get(
+        "http://localhost:1337/api/github/token"
       );
 
       console.log(response, "resp xx");
@@ -103,26 +90,9 @@ const GitHub = () => {
     const code = urlParams.get("code");
 
     try {
-      // const response = await fetch("http://localhost:1337/api/github/token", {
-      //   method: "POST", // *GET, POST, PUT, DELETE, etc.
-      //   headers: {
-      //     // "Content-Type": "application/json",
-      //     // "Content-Type": "application/x-www-form-urlencoded",
-      //     Authorization: `Bearer ${localStorage.getItem("token")}`,
-      //   },
-      //   body: JSON.stringify({ code }),
-      // });
-      const response = await axios.post(
-        "http://localhost:1337/api/github/token",
-        {
-          code,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`, // Set the Authorization header with the token
-          },
-        }
-      );
+      const response = await axiosAssetDashApi.post("/api/github/token", {
+        code,
+      });
       const accessToken = response.data.access_token;
       console.log(response.data, "resp xxx");
       setAccessToken(accessToken);
@@ -146,7 +116,7 @@ const GitHub = () => {
           },
         });
 
-        // console.log(response.data, "Github User Details");
+        console.log(response.data, "Github User Details");
 
         setUser(response.data);
       } catch (error) {
@@ -167,31 +137,59 @@ const GitHub = () => {
       }
     };
 
+    const fetchGithubInstallationId = async () => {
+      try {
+        const response = await axios.get(
+          "https://api.github.com/users/rahulmanas/installation",
+          {
+            headers: {
+              Authorization: `Bearer ${accessToken}`,
+              Accept: "application/vnd.github+json",
+            },
+          }
+        );
+
+        console.log(response, "fetchGithubInstallationId");
+      } catch (error) {
+        console.log(error, "err");
+      }
+    };
+
     if (accessToken) {
       fetchUserDetails();
       fetchRepoDetails();
+
+      fetchGithubInstallationId();
     }
   }, [accessToken]);
 
-  const fetchRepoCommitDetails = async (name, projectName) => {
+  useEffect(() => {
+    if (user) {
+      fetchAllCollaborators();
+    }
+  }, [user]);
+
+  const fetchAllCollaborators = async () => {
     try {
+      console.log("here coll");
       const response = await axios.get(
-        `https://api.github.com/repos/${name}/${projectName}/commits`,
+        `https://api.github.com/projects/${user.id}/collaborators`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
+            Accept: "application/vnd.github+json",
           },
         }
       );
-      console.log(response.data, "Github Repo Details");
-      setSelectedRepoDetails(response.data);
-    } catch (err) {
-      console.log(err, "err");
+
+      console.log(response, "fetchAllCollaborators");
+    } catch (error) {
+      console.log(error, "collaborator error");
     }
   };
 
   console.log(repoDetails, "repo details");
-  console.log(accessToken, "user access token details");
+  console.log(user, "user details");
 
   return (
     <div className="main-content mx-auto space-y-4">
@@ -237,55 +235,6 @@ const GitHub = () => {
           </div>
         </div>
       )}
-      {/* <div className="grid grid-cols-2 mt-8">
-        <div className="space-y-4">
-          <div>
-            <p className="text-2xl">List of all repositories</p>
-          </div>
-          <div className="space-y-1">
-            {repoDetails &&
-              repoDetails.map((repoDetail, index) => {
-                return (
-                  <div
-                    className="flex"
-                    key={index}
-                    onClick={() => {
-                      console.log(repoDetail, "selected");
-                      fetchRepoCommitDetails(user.login, repoDetail.name);
-                    }}
-                  >
-                    <div>{repoDetail.name}</div>
-                    <div>{repoDetail.id}</div>
-                  </div>
-                );
-              })}
-          </div>
-        </div>
-        {selectedRepoDetails && (
-          <div>
-            <p>Total Number of commits: {selectedRepoDetails.length}</p>
-            <div>
-              <p className="mb-4">Commit Details:</p>
-              <div className="space-y-2">
-                {selectedRepoDetails?.slice(0, 5).map((item) => {
-                  return (
-                    <div>
-                      <p>{item.sha}</p>
-                      <a
-                        href={item.html_url}
-                        target="_blank"
-                        className="underline"
-                      >
-                        {item.commit.message}
-                      </a>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        )}
-      </div> */}
     </div>
   );
 };

@@ -1,8 +1,7 @@
-// import { axiosAssetDashApi } from "./index.js";
-import axios from "axios";
+import { axiosAssetDashApi } from "./index";
 
 export const postAuthSignup = async (formValues) => {
-  return await axios.post("http://localhost:1337/signup", formValues);
+  return await axiosAssetDashApi.post("/signup", formValues);
 };
 
 export const postLoginUser = async ({ email, password }) => {
@@ -12,9 +11,9 @@ export const postLoginUser = async ({ email, password }) => {
 
   // console.log("useAuth", { walletData });
 
-  let loginURL = "http://localhost:1337/login";
+  let loginURL = "/login";
 
-  return await axios.post(
+  return await axiosAssetDashApi.post(
     loginURL,
     {
       email,
@@ -26,9 +25,4 @@ export const postLoginUser = async ({ email, password }) => {
       },
     }
   );
-};
-
-export const postLogout = async () => {
-  const token = localStorage.getItem("token");
-  return await axios.post("web/auth/logout", { token });
 };
