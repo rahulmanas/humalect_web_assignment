@@ -15,6 +15,33 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const publicPaths = ["/login", "/signup"];
+
+  useEffect(() => {
+    if (
+      localStorage.getItem("token") &&
+      localStorage.getItem("token") !== undefined
+    ) {
+      setIsLoggedIn(true);
+    }
+    setIsLoading(false);
+    const pathName = router.pathname;
+    console.log(pathName, "pathname zxxxx");
+    const resp = publicPaths.findIndex((path) => path === pathName);
+    if (
+      resp === -1 &&
+      !(
+        localStorage.getItem("token") &&
+        localStorage.getItem("token") !== undefined
+      )
+    ) {
+      router.push("/login");
+    }
+    // else if (resp > -1 && !isLoggedIn) {
+    //   router.push("/github"); //any authenticated route
+    // }
+  }, [router.pathname]);
+
   const login = async (email, password) => {
     if (!isLoading) {
       setIsLoading(true);
@@ -36,31 +63,32 @@ export const AuthProvider = ({ children }) => {
           }
         })
         .catch((err) => {
+          console.log(err, "err login");
           errorReturn = {
             status: "error",
-            message: "Email or password is invalid",
+            message: "Something went wrong",
           };
-          toast.error(err?.response?.data?.detail);
           setIsLoading(false);
           return errorReturn;
         });
     }
   };
 
-  const signup = async (email, password) => {
+  const signup = async (email, password, password_confirm, organization) => {
     if (!isLoading) {
       setIsLoading(true);
       return postAuthSignup({
         email,
         password,
+        password_confirm,
+        organization,
       })
         .then(async (res) => {
-          if (res.status === 200 && res.data.access_token) {
-            localStorage.setItem("token", res.data.access_token);
-            localStorage.setItem("user", JSON.stringify(res.data.user));
-            setUser(res.data.user);
+          if (res.status === 200 && res.data.token) {
+            localStorage.setItem("token", res.data.token);
             setIsLoggedIn(true);
             setIsLoading(false);
+            router.push("/github");
             return { status: "ok", message: "success", data: res.data };
           } else {
             throw new Error("Non 200 response");
@@ -68,9 +96,10 @@ export const AuthProvider = ({ children }) => {
         })
         .catch((err) => {
           setIsLoading(false);
+          console.log(err, "err signup");
           return {
             status: "error",
-            message: err.response.data.detail || "Email or password is invalid",
+            message: "Something went wrong",
           };
         });
     }
@@ -81,6 +110,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         user,
         isLoggedIn,
+        setIsLoggedIn,
         isLoading,
         setIsLoading,
         login,

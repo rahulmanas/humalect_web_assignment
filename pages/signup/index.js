@@ -5,19 +5,20 @@ import {
   validatePasswordOrReturnError,
 } from "../../utils/auth";
 import { useAuth } from "../../hooks/useAuth";
-import { toast } from "react-hot-toast";
 
-export default function Login() {
+export default function Signup() {
   const [isLoading, setIsLoading] = useState(false);
   const [passwordError, setPasswordError] = useState("");
   const [emailError, setEmailError] = useState("");
   const [userFormValues, setUserFormValues] = useState({
     email: "",
     password: "",
+    password_confirm: "",
+    organization: "",
   });
 
-  const { login } = useAuth();
-  const { email, password } = userFormValues;
+  const { signup } = useAuth();
+  const { email, password, password_confirm, organization } = userFormValues;
 
   useEffect(() => {
     if (emailError) setEmailError("");
@@ -57,10 +58,15 @@ export default function Login() {
     return passwordError === "" && emailError === "";
   };
 
-  const handleWebLogin = async (e) => {
+  const handleWebSignup = async (e) => {
     e.preventDefault();
     if (isValid()) {
-      await login(userFormValues.email, userFormValues.password);
+      await signup(
+        userFormValues.email,
+        userFormValues.password,
+        userFormValues.password_confirm,
+        userFormValues.organization
+      );
     }
 
     userFormValues.email ? setPasswordError("") : setEmailError("Required");
@@ -75,7 +81,7 @@ export default function Login() {
         <div className="login-box">
           <div className="justify-center">
             <h1 className="text-center text-2xl leading-6 font-bold mb-7">
-              Login
+              Signup
             </h1>
             <div className="space-y-2">
               <div>
@@ -109,12 +115,43 @@ export default function Login() {
                   {passwordError}
                 </div>
               </div>
+              <div>
+                <div className="space-y-2">
+                  <div className="text-left input-label-text">
+                    Confirm Password
+                  </div>
+                  <PasswordField
+                    id="password_confirm"
+                    value={password_confirm}
+                    onChange={handleChange}
+                  />
+                </div>
+                <div className="text-sm text-primary-red h-4 mt-1">
+                  {passwordError}
+                </div>
+              </div>
+              <div>
+                <div className="space-y-2">
+                  <div className="input-label-text">Organization</div>
+                  <input
+                    id="organization"
+                    type="text"
+                    value={organization}
+                    className="input-box"
+                    onChange={handleChange}
+                  />
+                </div>
+
+                <div className="text-sm text-primary-red h-5 mt-1">
+                  {emailError}
+                </div>
+              </div>
             </div>
             <button
               className="flex items-center justify-center mt-4 solid py-3 bg-price-green w-full mx-auto rounded-xl font-semibold text-sm leading-3.5 text-black"
-              onClick={handleWebLogin}
+              onClick={handleWebSignup}
             >
-              <div>Login</div>
+              <div>Signup</div>
               {isLoading && (
                 <svg
                   className="animate-spin  h-5 w-5 text-white ml-4 absolute"
@@ -141,10 +178,10 @@ export default function Login() {
             </button>
           </div>
           <div className="flex space-x-2 justify-center items-center mt-8 text-center">
-            <div className="">Don't have an account?</div>
+            <div className="">Already have an account?</div>
             <div className="font-bold">
-              <a href="/signup" className="underline cursor-pointer">
-                Sign Up
+              <a href="/login" className="underline cursor-pointer">
+                Log In
               </a>
             </div>
           </div>

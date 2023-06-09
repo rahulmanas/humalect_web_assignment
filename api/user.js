@@ -2,7 +2,7 @@
 import axios from "axios";
 
 export const postAuthSignup = async (formValues) => {
-  return await axios.post("web/auth/signup", formValues);
+  return await axios.post("http://localhost:1337/signup", formValues);
 };
 
 export const postLoginUser = async ({ email, password }) => {

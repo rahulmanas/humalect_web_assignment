@@ -16,6 +16,8 @@ module.exports = {
         dark: "#1A1A1B",
         "input-box": "#353B47",
         "price-green": "#21CE99",
+        "primary-gray": "#F2F2F2",
+        "dark-background": "#1C1E29",
       },
       maxWidth: {
         "screen-content": "76.125rem", //87rem

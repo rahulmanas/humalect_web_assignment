@@ -27,6 +27,7 @@ const GitHub = () => {
     } else {
       // delete the connection from the db and fetch token again;
       try {
+        const token = localStorage.getItem("token");
         const response = await axios.delete(
           "http://localhost:1337/api/github/token",
           {
@@ -34,7 +35,7 @@ const GitHub = () => {
           },
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`, // Set the Authorization header with the token
+              Authorization: `Bearer ${token}`, // Set the Authorization header with the token
             },
           }
         );
@@ -194,19 +195,19 @@ const GitHub = () => {
 
   return (
     <div className="main-content mx-auto space-y-4">
-      <h1 className="text-4xl text-center">GitHub Authentication</h1>
-      <div className="bg-green-100 shadow-lg w-max rounded-lg overflow-hidden p-4">
+      <h1 className="text-4xl text-center text-black">GitHub Authentication</h1>
+      <div className="bg-white shadow-lg w-max rounded-lg overflow-hidden p-4">
         <div>
           <button
             onClick={handleGithubRedirection}
-            className="px-4 py-2 bg-green-300 rounded-xl"
+            className="px-4 py-2 bg-price-green rounded-xl"
           >
             {buttonText}
           </button>
         </div>
       </div>
       {repoDetails && (
-        <div className="bg-green-100 shadow-lg rounded-lg overflow-hidden p-4 space-y-4">
+        <div className="bg-white text-black shadow-lg rounded-lg overflow-hidden p-4 space-y-4">
           <div className="flex bg-gray-200 w-max rounded-xl">
             {tabs.map((tab) => {
               return (

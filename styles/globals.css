@@ -60,9 +60,13 @@ button {
 }
 
 .login-box {
-  @apply relative max-w-539 w-full pt-14 pb-11 px-8 lg:px-12 bg-border-bg dark:bg-dark rounded-xl text-primary-dark dark:text-white mx-auto;
+  @apply relative max-w-539 w-full pt-14 pb-11 px-8 lg:px-12 bg-black  rounded-xl text-primary-dark dark:text-white mx-auto;
 }
 
 .input-box {
   @apply rounded-xl w-full px-4 py-2 text-black;
+}
+
+.screen {
+  @apply min-h-screen bg-primary-gray  dark:text-white text-black flex flex-col justify-between;
 }
