@@ -58,7 +58,11 @@ export default function Tab2Details({ repoDetails, user, accessToken }) {
           >
             <option value="">-- Select --</option>
             {repoDetails?.map((repoDetail) => {
-              return <option value={repoDetail.name}>{repoDetail.name}</option>;
+              return (
+                <option key={repoDetail.id} value={repoDetail.name}>
+                  {repoDetail.name}
+                </option>
+              );
             })}
           </select>
         </div>

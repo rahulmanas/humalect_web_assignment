@@ -165,7 +165,7 @@ const GitHub = () => {
 
   useEffect(() => {
     if (user) {
-      fetchAllCollaborators();
+      // fetchAllCollaborators();
     }
   }, [user]);
 
@@ -223,7 +223,10 @@ const GitHub = () => {
           </div>
           <div>
             {selectedTab === "Tab1" && repoDetails && (
-              <Tab1Details repoDetails={repoDetails} />
+              <Tab1Details
+                repoDetails={repoDetails}
+                accessToken={accessToken}
+              />
             )}
             {selectedTab === "Tab2" && repoDetails && (
               <Tab2Details
