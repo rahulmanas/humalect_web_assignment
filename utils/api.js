@@ -19,5 +19,7 @@ export const setBearerToken = async (config) => {
 };
 
 export const handleConfigError = (error) => {
-  return Promise.reject(error);
+  if (error?.response?.data?.message === "jwt expired")
+    localStorage.removeItem("token");
+  // return Promise.reject(error);
 };

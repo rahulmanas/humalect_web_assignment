@@ -1,47 +1,32 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useGithub } from "../../hooks/useGithub";
 
-export default function Tab2Details({ repoDetails, user, accessToken }) {
+export default function Tab2Details() {
   const [selectedOption, setSelectedOption] = useState("");
-  const [selectedRepo, setSelectedRepo] = useState(null);
-  const [selectedRepoDetails, setSelectedRepoDetails] = useState(null);
-  console.log(accessToken, "access tok");
+  const {
+    repoDetails,
+    githubUser,
+    accessToken,
+    selectedRepoDetails,
+    setSelectedRepoDetails,
+    fetchRepoCommitDetails,
+  } = useGithub();
 
   useEffect(() => {
     if (!repoDetails) setSelectedRepoDetails(null);
   }, [repoDetails]);
 
-  const handleOptionChange = (event, repoDetail) => {
+  const handleOptionChange = (event) => {
     setSelectedOption(event.target.value);
-    // debugger;
-    // repoDetail && fetchRepoCommitDetails(user.login, repoDetail?.name);
   };
 
   useEffect(() => {
     if (selectedOption) {
       const resp = repoDetails.filter((item) => item.name === selectedOption);
-      fetchRepoCommitDetails(user.login, resp[0]?.name);
+      fetchRepoCommitDetails(githubUser.login, resp[0]?.name);
     }
   }, [selectedOption]);
-
-  const fetchRepoCommitDetails = async (name, projectName) => {
-    try {
-      //   debugger;
-      const response = await axios.get(
-        `https://api.github.com/repos/${name}/${projectName}/commits`,
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
-        }
-      );
-      setSelectedRepoDetails(response.data);
-    } catch (err) {
-      console.log(err, "err");
-    }
-  };
-
-  console.log(selectedRepoDetails, "repo deta");
 
   return (
     <div>

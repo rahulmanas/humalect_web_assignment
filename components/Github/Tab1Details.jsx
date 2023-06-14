@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import {
@@ -11,6 +10,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useGithub } from "../../hooks/useGithub";
 
 ChartJS.register(
   CategoryScale,
@@ -21,10 +21,10 @@ ChartJS.register(
   Legend
 );
 
-export default function Tab1Details({ repoDetails, accessToken }) {
-  // A bar chart that compares the contributors count for each repository.
-  // - A table containing the data of all the repositories in the account
+export default function Tab1Details() {
   const [collaboratorData, setCollaboratorData] = useState([]);
+  const { repoDetails, accessToken } = useGithub();
+  const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     const fetchContributorsData = () => {
@@ -40,14 +40,10 @@ export default function Tab1Details({ repoDetails, accessToken }) {
               },
             });
             if (resp) {
-              // debugger;
-              // if (!collaboratorData) setCollaboratorData(resp.data || 0);
-              // else
               setCollaboratorData((prevState) => [
                 ...prevState,
                 { count: resp.data.length || 0, labels: item.id },
               ]);
-              // }
             }
           } catch (error) {
             console.log(error, "err");
@@ -59,23 +55,11 @@ export default function Tab1Details({ repoDetails, accessToken }) {
     if (repoDetails) {
       fetchContributorsData();
     }
+    return () => {
+      setChartData(null);
+      setCollaboratorData([]);
+    };
   }, [repoDetails]);
-
-  console.log("====================================");
-  console.log(collaboratorData, "collaborators");
-  console.log("====================================");
-
-  const [chartData, setChartData] = useState(null);
-
-  const labels = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-  ];
 
   useEffect(() => {
     if (collaboratorData) {
@@ -94,8 +78,6 @@ export default function Tab1Details({ repoDetails, accessToken }) {
       setChartData(data);
     }
   }, [collaboratorData]);
-
-  console.log(chartData, "chart data");
 
   return (
     <div>
