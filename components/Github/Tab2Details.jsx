@@ -68,7 +68,7 @@ export default function Tab2Details() {
                 <ul className="space-y-4 list-disc pl-4">
                   {selectedRepoDetails?.slice(0, 5).map((item) => {
                     return (
-                      <li>
+                      <li key={item.sha}>
                         <p>{item.sha}</p>
                         <a
                           href={item.html_url}
