@@ -8,6 +8,7 @@ import { axiosAssetDashApi } from "../../api";
 import { handleConfigError } from "../../utils/api";
 import { useGithub } from "../../hooks/useGithub";
 import withAuth from "../../HOC/withAuth";
+import { NextSeo } from "next-seo";
 // import { axiosAssetDashApi } from "../../api";
 
 const GitHub = () => {
@@ -68,6 +69,11 @@ const GitHub = () => {
 
   return (
     <div className="main-content mx-auto space-y-4">
+      <NextSeo
+        title={`Humalect - Github Page`}
+        noindex={true}
+        nofollow={true}
+      />
       <h1 className="text-4xl text-center text-black">GitHub Authentication</h1>
       <div className="bg-white shadow-lg w-max rounded-lg overflow-hidden p-4">
         <div>

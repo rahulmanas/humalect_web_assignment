@@ -1,8 +1,10 @@
+import { NextSeo } from "next-seo";
 import AuthComponent from "../../components/Auth/AuthComponent";
 
 export default function Login() {
   return (
     <div>
+      <NextSeo title={`Humalect - Login`} noindex={true} nofollow={true} />
       <div className="pt-40 min-h-screen">
         <div className="login-box">
           <div className="justify-center">
