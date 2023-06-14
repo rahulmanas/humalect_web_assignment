@@ -132,6 +132,21 @@ export const GithubProvider = ({ children }) => {
     }
   };
 
+  const fetchContributorData = async (contributors_url) => {
+    try {
+      const resp = await axios.get(contributors_url, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          Accept: "application/vnd.github+json",
+        },
+      });
+      if (resp.status === 200) return { data: resp.data, error: false };
+      else return { error: true };
+    } catch (error) {
+      return { data: error, error: true };
+    }
+  };
+
   return (
     <GithubContext.Provider
       value={{
@@ -150,6 +165,7 @@ export const GithubProvider = ({ children }) => {
         buttonText,
         setButtonText,
         deleteGithubToken,
+        fetchContributorData,
       }}
     >
       {children}

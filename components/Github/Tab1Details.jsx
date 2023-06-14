@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -23,30 +22,22 @@ ChartJS.register(
 
 export default function Tab1Details() {
   const [collaboratorData, setCollaboratorData] = useState([]);
-  const { repoDetails, accessToken } = useGithub();
+  const { repoDetails, fetchContributorData } = useGithub();
   const [chartData, setChartData] = useState(null);
 
   useEffect(() => {
     const fetchContributorsData = () => {
       if (repoDetails && repoDetails.length > 0) {
         repoDetails.map(async (item) => {
-          try {
-            const { contributors_url } = item;
+          const { contributors_url } = item;
 
-            const resp = await axios.get(contributors_url, {
-              headers: {
-                Authorization: `Bearer ${accessToken}`,
-                Accept: "application/vnd.github+json",
-              },
-            });
-            if (resp) {
-              setCollaboratorData((prevState) => [
-                ...prevState,
-                { count: resp.data.length || 0, labels: item.id },
-              ]);
-            }
-          } catch (error) {
-            console.log(error, "err");
+          const resp = await fetchContributorData(contributors_url);
+
+          if (!resp.error) {
+            setCollaboratorData((prevState) => [
+              ...prevState,
+              { count: resp.data.length || 0, labels: item.id },
+            ]);
           }
         });
       }
@@ -82,8 +73,8 @@ export default function Tab1Details() {
   return (
     <div>
       <div className="space-y-8">
-        <div>
-          <p>Contributors Chart</p>
+        <div className="space-y-4">
+          <p className="text-xl">Contributors Chart</p>
 
           <div>
             {chartData && (
@@ -91,8 +82,8 @@ export default function Tab1Details() {
             )}
           </div>
         </div>
-        <div className="space-y-4">
-          <p className="text-xl ">Repository Details</p>
+        <div className="space-y-4 overflow-scroll">
+          <p className="text-xl">Repository Details</p>
           <table className="table-auto">
             <thead>
               <tr>
