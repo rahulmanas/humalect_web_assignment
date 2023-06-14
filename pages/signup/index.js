@@ -1,10 +1,3 @@
-import React, { useEffect, useState } from "react";
-import { PasswordField } from "../../components/Login/PasswordField";
-import {
-  validateEmailOrReturnError,
-  validatePasswordOrReturnError,
-} from "../../utils/auth";
-import { useAuth } from "../../hooks/useAuth";
 import AuthComponent from "../../components/Auth/AuthComponent";
 
 export default function Signup() {
