@@ -1,30 +1,30 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useMemo, useState } from "react";
 import Tab1Details from "../../components/Github/Tab1Details";
 import Tab2Details from "../../components/Github/Tab2Details";
-import { toast } from "react-hot-toast";
 import { useRouter } from "next/router";
-import { axiosAssetDashApi } from "../../api";
-import { handleConfigError } from "../../utils/api";
 import { useGithub } from "../../hooks/useGithub";
 import withAuth from "../../HOC/withAuth";
 import { NextSeo } from "next-seo";
+import { useAuth } from "../../hooks/useAuth";
 // import { axiosAssetDashApi } from "../../api";
 
 const GitHub = () => {
   const router = useRouter();
   const {
     fetchToken,
-    accessToken,
+    tokenExistsData,
+    // accessToken,
+    githubUser,
     submitCode,
-    fetchUserDetails,
+    fetchGithubUserDetails,
     fetchRepoDetails,
     repoDetails,
-    fetchGithubInstallationId,
+    // fetchGithubInstallationId,
     deleteGithubToken,
     buttonText,
     setButtonText,
   } = useGithub();
+  const { fetchUserDetails, user } = useAuth();
   const tabs = ["Tab1", "Tab2"];
   const [selectedTab, setSelectedTab] = useState("Tab1");
 
@@ -36,36 +36,47 @@ const GitHub = () => {
 
       window.location.href = `https://github.com/login/oauth/authorize?client_id=${clientId}&redirect_uri=${redirectUri}`;
     } else {
-      await deleteGithubToken();
+      await deleteGithubToken(user?.id);
     }
   };
 
+  console.log(user, "user deta");
+
   useEffect(() => {
     fetchToken();
+    fetchUserDetails();
   }, []);
+
+  useEffect(() => {
+    if (tokenExistsData) {
+      fetchGithubUserDetails();
+      fetchRepoDetails();
+    }
+  }, [tokenExistsData]);
 
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const code = urlParams.get("code");
-    if (code) submitCode(code);
+    if (code) {
+      handleSubmitCode(code);
+    }
   }, [router.asPath]);
 
+  const handleSubmitCode = async (code) => {
+    await submitCode(code);
+
+    await fetchToken();
+  };
+
+  console.log(tokenExistsData, "to xx");
+
   useEffect(() => {
-    if (accessToken) {
+    if (githubUser) {
       setButtonText("Disconnect your repository");
     } else {
       setButtonText("Connect your repository");
     }
-  }, [accessToken]);
-
-  useMemo(() => {
-    if (accessToken) {
-      fetchUserDetails();
-      fetchRepoDetails();
-
-      fetchGithubInstallationId();
-    }
-  }, [accessToken]);
+  }, [githubUser]);
 
   return (
     <div className="main-content mx-auto space-y-4">
@@ -85,7 +96,7 @@ const GitHub = () => {
           </button>
         </div>
       </div>
-      {accessToken && (
+      {repoDetails && (
         <div className="bg-white text-black shadow-lg rounded-lg overflow-hidden p-4 space-y-4">
           <div className="flex bg-gray-200 w-max rounded-xl">
             {tabs.map((tab) => {

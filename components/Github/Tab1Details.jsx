@@ -78,21 +78,18 @@ export default function Tab1Details() {
     <div>
       <div className="space-y-8">
         <div className="space-y-4">
-          <p className="text-xl">Contributors Chart</p>
-
-          {chartData ? (
+          {chartData && repoDetails && (
             <div>
+              <p className="text-xl">Contributors Chart</p>
               {chartData && (
                 <Bar data={chartData} options={{ responsive: true }} />
               )}
             </div>
-          ) : (
-            <ShimmerThumbnail height={250} rounded />
           )}
         </div>
         <div className="space-y-4 overflow-scroll">
-          <p className="text-xl">Repository Details</p>
-          {repoDetails ? (
+          {repoDetails && <p className="text-xl">Repository Details</p>}
+          {repoDetails && (
             <div>
               <table className="table-auto">
                 <thead>
@@ -112,36 +109,38 @@ export default function Tab1Details() {
                   </tr>
                 </thead>
                 <tbody>
-                  {repoDetails?.map((item) => (
-                    <tr key={item.id}>
-                      <td className="border border-solid border-slate-400 px-4 py-2">
-                        <Link href={item.html_url} target="_blank">
-                          {item.id}
-                        </Link>
-                      </td>
-                      <td className="border border-solid border-slate-400 px-4 py-2">
-                        <div className="flex space-x-2">
-                          <img
-                            src={item.owner.avatar_url}
-                            alt={item.name}
-                            className="h-8 w-8 rounded-full"
-                          />
-                          <p>{item.full_name}</p>
-                        </div>
-                      </td>
-                      <td className="border border-solid border-slate-400 px-4 py-2 capitalize">
-                        {item.visibility}
-                      </td>
-                      <td className="border border-solid border-slate-400 px-4 py-2">
-                        {item.updated_at}
-                      </td>
-                    </tr>
-                  ))}
+                  {repoDetails &&
+                    repoDetails.length > 0 &&
+                    repoDetails?.map((item) => {
+                      return (
+                        <tr key={item.id}>
+                          <td className="border border-solid border-slate-400 px-4 py-2">
+                            <Link href={item.html_url} target="_blank">
+                              {item.id}
+                            </Link>
+                          </td>
+                          <td className="border border-solid border-slate-400 px-4 py-2">
+                            <div className="flex space-x-2">
+                              <img
+                                src={item.owner.avatar_url}
+                                alt={item.name}
+                                className="h-8 w-8 rounded-full"
+                              />
+                              <p>{item.full_name}</p>
+                            </div>
+                          </td>
+                          <td className="border border-solid border-slate-400 px-4 py-2 capitalize">
+                            {item.visibility}
+                          </td>
+                          <td className="border border-solid border-slate-400 px-4 py-2">
+                            {item.updated_at}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
             </div>
-          ) : (
-            <ShimmerTable row={5} col={5} />
           )}
         </div>
       </div>

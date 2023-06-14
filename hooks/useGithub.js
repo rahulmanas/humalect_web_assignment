@@ -2,12 +2,14 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import {
   deleteGithubAuthToken,
-  fetchGithubAuthToken,
+  getGithubAuthToken,
+  getGithubUserDetails,
   postGithubAuthToken,
 } from "../api/github";
 import { toast } from "react-hot-toast";
 import { handleConfigError } from "../utils/api";
 import axios from "axios";
+import { axiosAssetDashApi } from "../api";
 
 export const GithubContext = createContext({});
 
@@ -17,7 +19,8 @@ export function useGithub() {
 
 export const GithubProvider = ({ children }) => {
   const router = useRouter();
-  const [accessToken, setAccessToken] = useState(null);
+  // const [accessToken, setAccessToken] = useState(null);
+  const [tokenExistsData, setTokenExistsData] = useState(null);
   const [githubUser, setGithubUser] = useState(null);
   const [repoDetails, setRepoDetails] = useState(null);
   const [selectedRepoDetails, setSelectedRepoDetails] = useState(null);
@@ -26,15 +29,14 @@ export const GithubProvider = ({ children }) => {
 
   const fetchToken = async () => {
     try {
-      const response = await fetchGithubAuthToken();
+      const response = await getGithubAuthToken();
 
       if (response.status === 200 && response.data) {
-        setAccessToken(response.data.access_token);
+        setTokenExistsData(response.data);
       } else {
-        setAccessToken(null);
+        setTokenExistsData(null);
       }
     } catch (error) {
-      toast.error(error?.response?.data?.message);
       handleConfigError(error);
     }
   };
@@ -45,17 +47,17 @@ export const GithubProvider = ({ children }) => {
         code: code,
       };
       const response = await postGithubAuthToken(payload);
-      const accessToken = response.data.access_token;
-      setAccessToken(accessToken);
+      // const accessToken = response.data.access_token;
+      // setAccessToken(accessToken);
       router.push("/github");
     } catch (error) {
       toast.error(error?.response?.data?.err_msg);
     }
   };
 
-  const deleteGithubToken = async () => {
+  const deleteGithubToken = async (id) => {
     try {
-      let payload = { access_token: accessToken };
+      let payload = { user_id: id }; //todo
       const response = await deleteGithubAuthToken(payload);
       if (response.status === 200) {
         setButtonText("Connect your repository");
@@ -70,13 +72,9 @@ export const GithubProvider = ({ children }) => {
     }
   };
 
-  const fetchUserDetails = async () => {
+  const fetchGithubUserDetails = async () => {
     try {
-      const response = await axios.get("https://api.github.com/user", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await getGithubUserDetails();
 
       console.log(response.data, "Github User Details");
 
@@ -85,13 +83,10 @@ export const GithubProvider = ({ children }) => {
       console.log("Error fetching user details:", error);
     }
   };
+
   const fetchRepoDetails = async () => {
     try {
-      const response = await axios.get("https://api.github.com/user/repos", {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-        },
-      });
+      const response = await axiosAssetDashApi.get("/api/github/repos");
       // console.log(response.data, "Github Repo Details");
       setRepoDetails(response.data);
     } catch (err) {
@@ -99,33 +94,32 @@ export const GithubProvider = ({ children }) => {
     }
   };
 
-  const fetchGithubInstallationId = async () => {
-    try {
-      const response = await axios.get(
-        "https://api.github.com/users/rahulmanas/installation",
-        {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-            Accept: "application/vnd.github+json",
-          },
-        }
-      );
+  // const fetchGithubInstallationId = async () => {
+  //   try {
+  //     const response = await axios.get(
+  //       "https://api.github.com/users/rahulmanas/installation",
+  //       {
+  //         headers: {
+  //           Authorization: `Bearer ${accessToken}`,
+  //           Accept: "application/vnd.github+json",
+  //         },
+  //       }
+  //     );
 
-      console.log(response, "fetchGithubInstallationId");
-    } catch (error) {
-      console.log(error, "err");
-    }
-  };
+  //     console.log(response, "fetchGithubInstallationId");
+  //   } catch (error) {
+  //     console.log(error, "err");
+  //   }
+  // };
 
   const fetchRepoCommitDetails = async (name, projectName) => {
     try {
       setIsTabLoading(true);
-      const response = await axios.get(
-        `https://api.github.com/repos/${name}/${projectName}/commits`,
+      const response = await axiosAssetDashApi.post(
+        `/api/github/repos/commits`,
         {
-          headers: {
-            Authorization: `Bearer ${accessToken}`,
-          },
+          name,
+          projectName,
         }
       );
       setSelectedRepoDetails(response.data);
@@ -138,12 +132,12 @@ export const GithubProvider = ({ children }) => {
 
   const fetchContributorData = async (contributors_url) => {
     try {
-      const resp = await axios.get(contributors_url, {
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          Accept: "application/vnd.github+json",
-        },
-      });
+      const resp = await axiosAssetDashApi.post(
+        "/api/github/contributor-data",
+        {
+          url: contributors_url,
+        }
+      );
       if (resp.status === 200) return { data: resp.data, error: false };
       else return { error: true };
     } catch (error) {
@@ -155,14 +149,15 @@ export const GithubProvider = ({ children }) => {
     <GithubContext.Provider
       value={{
         fetchToken,
-        accessToken,
-        setAccessToken,
+        // accessToken,
+        // setAccessToken,
+        tokenExistsData,
         submitCode,
         githubUser,
         repoDetails,
-        fetchUserDetails,
+        fetchGithubUserDetails,
         fetchRepoDetails,
-        fetchGithubInstallationId,
+        // fetchGithubInstallationId,
         selectedRepoDetails,
         setSelectedRepoDetails,
         fetchRepoCommitDetails,

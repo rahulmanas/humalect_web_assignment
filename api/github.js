@@ -1,6 +1,6 @@
 import { axiosAssetDashApi } from "./index";
 
-export const fetchGithubAuthToken = async () => {
+export const getGithubAuthToken = async () => {
   return await axiosAssetDashApi.get("/api/github/token");
 };
 
@@ -12,4 +12,8 @@ export const deleteGithubAuthToken = async (payload) => {
   return await axiosAssetDashApi.delete("/api/github/token", {
     data: payload,
   });
+};
+
+export const getGithubUserDetails = async (payload) => {
+  return await axiosAssetDashApi.get("/api/github/user");
 };

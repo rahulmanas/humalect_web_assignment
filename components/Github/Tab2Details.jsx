@@ -8,7 +8,7 @@ export default function Tab2Details() {
   const {
     repoDetails,
     githubUser,
-    accessToken,
+    // accessToken,
     selectedRepoDetails,
     setSelectedRepoDetails,
     fetchRepoCommitDetails,

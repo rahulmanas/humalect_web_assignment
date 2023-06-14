@@ -3,6 +3,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { postAuthSignup, postLoginUser } from "../api/user";
 import Cookies from "js-cookie";
+import { axiosAssetDashApi } from "../api";
 
 export const AuthContext = createContext({});
 
@@ -23,6 +24,15 @@ export const AuthProvider = ({ children }) => {
     setIsLoading(false);
   }, [router.pathname]);
 
+  const fetchUserDetails = async () => {
+    try {
+      const resp = await axiosAssetDashApi.get("/api/users");
+
+      if (resp.status === 200) setUser(resp.data);
+    } catch (error) {
+      console.log(error, "Err");
+    }
+  };
   const login = async (email, password) => {
     if (!isLoading) {
       setIsLoading(true);
@@ -97,6 +107,7 @@ export const AuthProvider = ({ children }) => {
         setIsLoading,
         login,
         signup,
+        fetchUserDetails,
       }}
     >
       {children}
