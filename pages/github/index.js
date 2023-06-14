@@ -7,6 +7,7 @@ import { useRouter } from "next/router";
 import { axiosAssetDashApi } from "../../api";
 import { handleConfigError } from "../../utils/api";
 import { useGithub } from "../../hooks/useGithub";
+import withAuth from "../../HOC/withAuth";
 // import { axiosAssetDashApi } from "../../api";
 
 const GitHub = () => {
@@ -78,7 +79,7 @@ const GitHub = () => {
           </button>
         </div>
       </div>
-      {repoDetails && (
+      {accessToken && (
         <div className="bg-white text-black shadow-lg rounded-lg overflow-hidden p-4 space-y-4">
           <div className="flex bg-gray-200 w-max rounded-xl">
             {tabs.map((tab) => {
@@ -96,7 +97,7 @@ const GitHub = () => {
             })}
           </div>
           <div>
-            {selectedTab === "Tab1" && repoDetails && <Tab1Details />}
+            {selectedTab === "Tab1" && <Tab1Details />}
             {selectedTab === "Tab2" && repoDetails && <Tab2Details />}
           </div>
         </div>
@@ -105,4 +106,4 @@ const GitHub = () => {
   );
 };
 
-export default GitHub;
+export default withAuth(GitHub);

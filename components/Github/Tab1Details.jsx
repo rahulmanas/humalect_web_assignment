@@ -10,6 +10,8 @@ import {
   Legend,
 } from "chart.js";
 import { useGithub } from "../../hooks/useGithub";
+import Link from "next/link";
+import { ShimmerTable, ShimmerThumbnail } from "react-shimmer-effects-18";
 
 ChartJS.register(
   CategoryScale,
@@ -70,69 +72,77 @@ export default function Tab1Details() {
     }
   }, [collaboratorData]);
 
+  console.log(repoDetails, "rep de");
+
   return (
     <div>
       <div className="space-y-8">
         <div className="space-y-4">
           <p className="text-xl">Contributors Chart</p>
 
-          <div>
-            {chartData && (
-              <Bar data={chartData} options={{ responsive: true }} />
-            )}
-          </div>
+          {chartData ? (
+            <div>
+              {chartData && (
+                <Bar data={chartData} options={{ responsive: true }} />
+              )}
+            </div>
+          ) : (
+            <ShimmerThumbnail height={250} rounded />
+          )}
         </div>
         <div className="space-y-4 overflow-scroll">
           <p className="text-xl">Repository Details</p>
-          <table className="table-auto">
-            <thead>
-              <tr>
-                <th className="border border-solid border-slate-400 px-4 py-2">
-                  #
-                </th>
-                <th className="border border-solid border-slate-400 px-4 py-2">
-                  Name
-                </th>
-                <th className="border border-solid border-slate-400 px-4 py-2">
-                  Visibility
-                </th>
-                <th className="border border-solid border-slate-400 px-4 py-2">
-                  Updated At
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {repoDetails?.map((item) => (
-                <tr key={item.id}>
-                  <td className="border border-solid border-slate-400 px-4 py-2">
-                    <a
-                      href={item.html_url}
-                      target="_blank"
-                      className="underline"
-                    >
-                      {item.id}
-                    </a>
-                  </td>
-                  <td className="border border-solid border-slate-400 px-4 py-2">
-                    <div className="flex space-x-2">
-                      <img
-                        src={item.owner.avatar_url}
-                        alt={item.name}
-                        className="h-8 w-8 rounded-full"
-                      />
-                      <p>{item.full_name}</p>
-                    </div>
-                  </td>
-                  <td className="border border-solid border-slate-400 px-4 py-2 capitalize">
-                    {item.visibility}
-                  </td>
-                  <td className="border border-solid border-slate-400 px-4 py-2">
-                    {item.updated_at}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          {repoDetails ? (
+            <div>
+              <table className="table-auto">
+                <thead>
+                  <tr>
+                    <th className="border border-solid border-slate-400 px-4 py-2">
+                      #
+                    </th>
+                    <th className="border border-solid border-slate-400 px-4 py-2">
+                      Name
+                    </th>
+                    <th className="border border-solid border-slate-400 px-4 py-2">
+                      Visibility
+                    </th>
+                    <th className="border border-solid border-slate-400 px-4 py-2">
+                      Updated At
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {repoDetails?.map((item) => (
+                    <tr key={item.id}>
+                      <td className="border border-solid border-slate-400 px-4 py-2">
+                        <Link href={item.html_url} target="_blank">
+                          {item.id}
+                        </Link>
+                      </td>
+                      <td className="border border-solid border-slate-400 px-4 py-2">
+                        <div className="flex space-x-2">
+                          <img
+                            src={item.owner.avatar_url}
+                            alt={item.name}
+                            className="h-8 w-8 rounded-full"
+                          />
+                          <p>{item.full_name}</p>
+                        </div>
+                      </td>
+                      <td className="border border-solid border-slate-400 px-4 py-2 capitalize">
+                        {item.visibility}
+                      </td>
+                      <td className="border border-solid border-slate-400 px-4 py-2">
+                        {item.updated_at}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <ShimmerTable row={5} col={5} />
+          )}
         </div>
       </div>
     </div>

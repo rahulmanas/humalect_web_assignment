@@ -1,11 +1,14 @@
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import Cookies from "js-cookie";
 
 export const AuthButton = () => {
   const router = useRouter();
   const [buttonText, setButtonText] = useState("Log In");
   const { isLoggedIn, setIsLoggedIn } = useAuth();
+
+  console.log(isLoggedIn, "is l");
 
   useEffect(() => {
     if (isLoggedIn) setButtonText("Log Out");
@@ -16,7 +19,7 @@ export const AuthButton = () => {
     if (!isLoggedIn) router.push("/login");
     else {
       //logout
-      localStorage.removeItem("token");
+      Cookies.remove("token");
       router.push("/login");
       setIsLoggedIn(false);
     }

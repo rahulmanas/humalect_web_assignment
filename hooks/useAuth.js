@@ -2,6 +2,7 @@ import toast from "react-hot-toast";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { postAuthSignup, postLoginUser } from "../api/user";
+import Cookies from "js-cookie";
 
 export const AuthContext = createContext({});
 
@@ -15,31 +16,11 @@ export const AuthProvider = ({ children }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const publicPaths = ["/login", "/signup"];
-
   useEffect(() => {
-    if (
-      localStorage.getItem("token") &&
-      localStorage.getItem("token") !== undefined
-    ) {
+    if (Cookies.get("token") && Cookies.get("token") !== undefined) {
       setIsLoggedIn(true);
     }
     setIsLoading(false);
-    const pathName = router.pathname;
-    console.log(pathName, "pathname zxxxx");
-    const resp = publicPaths.findIndex((path) => path === pathName);
-    if (
-      resp === -1 &&
-      !(
-        localStorage.getItem("token") &&
-        localStorage.getItem("token") !== undefined
-      )
-    ) {
-      router.push("/login");
-    }
-    // else if (resp > -1 && !isLoggedIn) {
-    //   router.push("/github"); //any authenticated route
-    // }
   }, [router.pathname]);
 
   const login = async (email, password) => {
@@ -49,7 +30,7 @@ export const AuthProvider = ({ children }) => {
       return postLoginUser({ email, password })
         .then(async (res) => {
           if (res.status === 200 && res.data.token) {
-            localStorage.setItem("token", res.data.token);
+            Cookies.set("token", res.data.token);
             // localStorage.setItem("user", JSON.stringify(res.data.user));
             setIsLoggedIn(true);
             errorReturn = { status: "ok", message: "success", data: res.data };
@@ -85,7 +66,7 @@ export const AuthProvider = ({ children }) => {
       })
         .then(async (res) => {
           if (res.status === 200 && res.data.token) {
-            localStorage.setItem("token", res.data.token);
+            Cookies.set("token", res.data.token);
             setIsLoggedIn(true);
             setIsLoading(false);
             router.push("/github");

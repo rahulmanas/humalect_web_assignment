@@ -22,6 +22,7 @@ export const GithubProvider = ({ children }) => {
   const [repoDetails, setRepoDetails] = useState(null);
   const [selectedRepoDetails, setSelectedRepoDetails] = useState(null);
   const [buttonText, setButtonText] = useState("Connect your repository");
+  const [isTabLoading, setIsTabLoading] = useState(false);
 
   const fetchToken = async () => {
     try {
@@ -166,6 +167,8 @@ export const GithubProvider = ({ children }) => {
         setButtonText,
         deleteGithubToken,
         fetchContributorData,
+        isTabLoading,
+        setIsTabLoading,
       }}
     >
       {children}
