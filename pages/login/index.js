@@ -33,7 +33,6 @@ export default function Login() {
 
   const validateEmail = (val) => {
     const validEmail = validateEmailOrReturnError(val);
-    // console.log(validEmail, "validEmail");
 
     if (validEmail) {
       setEmailError(validEmail);

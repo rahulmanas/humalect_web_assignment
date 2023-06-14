@@ -47,8 +47,9 @@ export const AuthProvider = ({ children }) => {
           console.log(err, "err login");
           errorReturn = {
             status: "error",
-            message: "Something went wrong",
+            message: "Please check your email/password",
           };
+          toast.error("Please check your email/password");
           setIsLoading(false);
           return errorReturn;
         });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useGithub } from "../../hooks/useGithub";
+import { ShimmerPostDetails } from "react-shimmer-effects-18";
 
 export default function Tab2Details() {
   const [selectedOption, setSelectedOption] = useState("");
@@ -11,6 +12,7 @@ export default function Tab2Details() {
     selectedRepoDetails,
     setSelectedRepoDetails,
     fetchRepoCommitDetails,
+    isTabLoading,
   } = useGithub();
 
   useEffect(() => {
@@ -52,13 +54,17 @@ export default function Tab2Details() {
           </select>
         </div>
         <div>
-          {selectedRepoDetails && (
+          {!isTabLoading ? (
             <div className="space-y-4">
-              <p className="font-bold">
-                Total Number of commits: {selectedRepoDetails.length}
-              </p>
+              {selectedRepoDetails?.length && (
+                <p className="font-bold">
+                  Total Number of commits: {selectedRepoDetails?.length}
+                </p>
+              )}
               <div>
-                <p className="mb-4 font-bold text-xl">Commit Details:</p>
+                {selectedRepoDetails?.length && (
+                  <p className="mb-4 font-bold text-xl">Commit Details:</p>
+                )}
                 <ul className="space-y-4 list-disc pl-4">
                   {selectedRepoDetails?.slice(0, 5).map((item) => {
                     return (
@@ -77,6 +83,12 @@ export default function Tab2Details() {
                 </ul>
               </div>
             </div>
+          ) : (
+            isTabLoading && (
+              <div>
+                <ShimmerPostDetails card cta variant="EDITOR" />
+              </div>
+            )
           )}
         </div>
       </div>

@@ -119,6 +119,7 @@ export const GithubProvider = ({ children }) => {
 
   const fetchRepoCommitDetails = async (name, projectName) => {
     try {
+      setIsTabLoading(true);
       const response = await axios.get(
         `https://api.github.com/repos/${name}/${projectName}/commits`,
         {
@@ -128,8 +129,10 @@ export const GithubProvider = ({ children }) => {
         }
       );
       setSelectedRepoDetails(response.data);
+      setIsTabLoading(false);
     } catch (err) {
       console.log(err, "err");
+      setIsTabLoading(false);
     }
   };
 
